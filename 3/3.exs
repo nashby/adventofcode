@@ -5,10 +5,8 @@ defmodule Day3A do
 
     regexp = ~r/(\d+),(\d+):\s(\d+)+x(\d+)/
 
-    canvas = Enum.map(1..1000, fn(row) ->
-      Enum.map(1..1000, fn(column) ->
-        0
-      end)
+    canvas = Enum.reduce(0..(1000 * 1000), %{}, fn(i, acc) ->
+      Map.put(acc, i, 0)
     end)
 
     updated_canvas = Enum.map(strings, fn (string) ->
@@ -20,19 +18,22 @@ defmodule Day3A do
         String.to_integer(height)
       ]
     end)
-    |> Enum.reduce(canvas, fn (rect, canvas_tt) ->
+
+    |> Enum.reduce(canvas, fn (rect, canvas) ->
       [x, y, width, height] = rect
-      IO.inspect(rect)
-      Enum.reduce(y..height, canvas_tt, fn (yy, canvas_ee) ->
-        Enum.reduce(x..width, canvas_ee, fn (xx, canvas_acc) ->
-          val = Enum.at(Enum.at(canvas_acc, yy - 1), xx - 1)
-          List.replace_at(canvas_acc, yy - 1, List.replace_at(Enum.at(canvas_acc, yy - 1), xx - 1, val + 1))
+
+      Enum.reduce(y..(y + height - 1), canvas, fn (yy, canvas) ->
+        Enum.reduce(x..(x + width - 1), canvas, fn (xx, canvas) ->
+          val = canvas[xx + 1000 * yy]
+          Map.put(canvas, xx + 1000 * yy, val + 1)
         end)
       end)
     end)
 
-    updated_canvas |> IO.inspect
+    Map.values(updated_canvas) |> Enum.count(fn (i) -> i >= 2 end)
   end
 end
 
-Day3A.run
+Day3A.run |> IO.inspect
+
+# 103806
