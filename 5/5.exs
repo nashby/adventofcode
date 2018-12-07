@@ -2,27 +2,32 @@ defmodule Day5 do
   def run do
     chars = File.read!("5/data.txt")
     |> String.split("", trim: true)
-    |> delete([])
+    |> delete([], 0)
 
     chars |> IO.inspect(printable_limit: :infinity)
     chars |> Enum.count |> IO.inspect(printable_limit: :infinity)
   end
 
-  def delete([char_1 | [ char_2 | rest] = ff] = bb, acc) do
-    IO.inspect(Enum.count(bb))
+  def delete([char_1 | [ char_2 | rest] = ff] = bb, acc, reacted) do
     if is_reacting(char_1, char_2) do
-      delete(acc ++ rest, [])
+      delete(rest, acc, reacted + 1)
     else
-      delete(ff, acc ++ [char_1])
+      delete(ff, acc ++ [char_1], reacted)
     end
   end
 
-  def delete([char_1], acc) do
-    delete([], acc ++ [char_1])
+  def delete([char_1], acc, reacted) do
+    delete([], acc ++ [char_1], reacted)
   end
 
-  def delete([], acc) do
-    acc
+  def delete([], acc, reacted) do
+    IO.inspect(reacted)
+    IO.inspect(Enum.count(acc))
+    if reacted != 0 do
+      delete(acc, [], 0)
+    else
+      acc
+    end
   end
 
   def is_reacting(char1, char2) do
